@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Wien's Law Blackbody Radiation - Mr. Mercado Simulator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Orbitron:wght@500;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [["$", "$"], ["\\(", "\\)"]],
+          displayMath: [["$$", "$$"], ["\\[", "\\]"]],
+        },
+        svg: {
+          fontCache: "global",
+        },
+      };
+    </script>
+    <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="header">
+        <h1>Wien's Law Blackbody Radiation - Mr. Mercado Simulator</h1>
+        <p>Investigate how temperature determines the radiation emitted by objects.</p>
+      </header>
+
+      <main class="workflow-layout">
+        <section class="investigation-panel">
+          <section class="console-section summary-section">
+            <div class="section-row">
+              <h2>Blackbody Radiation</h2>
+              <span class="section-meta">Laboratory Notes</span>
+            </div>
+            <p>
+              A blackbody is an ideal object that emits electromagnetic radiation determined only
+              by its temperature.
+            </p>
+            <p>Examples include:</p>
+            <ul class="science-list">
+              <li>stars</li>
+              <li>planets</li>
+              <li>hot metals</li>
+              <li>incandescent filaments</li>
+            </ul>
+            <p class="research-note">
+              Students enter an object's temperature and analyze its radiation using Wien's Law.
+            </p>
+          </section>
+
+          <section class="console-section formula-section">
+            <div class="section-row formula-row">
+              <h2>Peak Wavelength (Wien's Law)</h2>
+              <span class="section-meta">Formula Card</span>
+            </div>
+            <div class="formula-card">
+              <div class="formula-equation">$$\lambda_{\text{max}} = \frac{0.0029}{T}$$</div>
+              <div class="formula-meta">
+                <span><strong>&lambda;<sub>max</sub></strong> = peak wavelength</span>
+                <span><strong>T</strong> = temperature (Kelvin)</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="console-section control-section">
+            <div class="section-row">
+              <h2>Investigation Controls</h2>
+              <span class="section-meta">Up to 6 objects</span>
+            </div>
+            <div class="button-grid controls-bar">
+              <button id="loadExamplesButton" class="button ghost" type="button">
+                Load Example Data
+              </button>
+              <button id="resetObjectsButton" class="button ghost" type="button">Reset Objects</button>
+              <button id="addObjectButton" class="button primary" type="button">Add Object</button>
+            </div>
+            <p class="control-note">
+              Use the controls to prepare the investigation, then generate radiation curves and
+              compare the spectrum below.
+            </p>
+          </section>
+
+          <section class="console-section investigation-cards-section">
+            <div class="section-row">
+              <h2>Object Investigation Cards</h2>
+              <span id="objectLimitHint" class="section-meta">Start with one object.</span>
+            </div>
+            <div id="objectCards" class="object-cards" aria-live="polite"></div>
+          </section>
+
+          <section class="console-section table-section">
+            <div class="section-row">
+              <h2>Investigation Table</h2>
+              <span class="section-meta">Generated objects only</span>
+            </div>
+            <div class="table-shell">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Object Name</th>
+                    <th>Description</th>
+                    <th>Temperature (K)</th>
+                    <th>Peak Wavelength (nm)</th>
+                    <th>Radiation Type</th>
+                    <th>Object Image</th>
+                  </tr>
+                </thead>
+                <tbody id="resultsTableBody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <div id="statusMessage" class="status-message" role="status" aria-live="polite"></div>
+        </section>
+
+        <section class="graph-section">
+          <div class="section-row">
+            <div>
+              <h2>Blackbody Radiation Spectrum</h2>
+              <p class="section-description">
+                Compare full-width blackbody curves, visible-spectrum alignment, and Wien peak markers.
+              </p>
+            </div>
+            <span class="section-meta">Full Visualization</span>
+          </div>
+          <div id="graph"></div>
+        </section>
+
+        <section class="report-section console-section">
+          <div class="section-row">
+            <div>
+              <h2>Investigation Report</h2>
+              <p class="section-description">
+                Export all object data and the final combined blackbody graph as a PDF report.
+              </p>
+            </div>
+            <span class="section-meta">Export</span>
+          </div>
+          <div class="report-actions">
+            <button id="generatePdfButton" class="button secondary" type="button">
+              Generate PDF Report
+            </button>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <template id="objectCardTemplate">
+      <article class="object-card">
+        <div class="card-topline">
+          <div>
+            <p class="card-label">Investigation Object</p>
+            <h3 class="card-title"></h3>
+            <p class="card-helper">Enter data below, then generate the radiation graph.</p>
+          </div>
+          <div class="card-tools">
+            <span class="color-indicator" aria-hidden="true"></span>
+            <button class="button danger remove-button" type="button">Remove Object</button>
+          </div>
+        </div>
+
+        <div class="field-grid">
+          <label class="field">
+            <span>Object Name</span>
+            <input class="object-name" type="text" placeholder="Example: Sun" />
+          </label>
+
+          <label class="field">
+            <span>Description</span>
+            <textarea
+              class="object-description"
+              rows="3"
+              placeholder="Why does this object behave approximately like a blackbody?"
+            ></textarea>
+          </label>
+
+          <label class="field">
+            <span>Temperature (Kelvin)</span>
+            <input
+              class="object-temperature"
+              type="number"
+              min="1"
+              step="any"
+              placeholder="Example: 5778"
+            />
+          </label>
+
+          <label class="field">
+            <span>Upload Object Image</span>
+            <input class="object-image" type="file" accept=".jpg,.jpeg,.png,image/png,image/jpeg" />
+          </label>
+        </div>
+
+        <div class="image-preview-frame">
+          <div class="image-preview-empty">No image uploaded yet.</div>
+          <img class="image-preview" alt="Uploaded object preview" hidden />
+        </div>
+
+        <div class="result-strip" hidden>
+          <div class="result-pill">
+            <span>Peak Wavelength</span>
+            <strong class="peak-value">-</strong>
+          </div>
+          <div class="result-pill">
+            <span>Radiation Type</span>
+            <strong class="radiation-value">-</strong>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="button primary generate-button" type="button">Generate Radiation Graph</button>
+        </div>
+      </article>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>
