@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mr. Mercado Simulator | Wien's Law Blackbody Explorer</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="page-shell">
+      <div class="page-noise" aria-hidden="true"></div>
+
+      <header class="hero">
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <div class="brand-row">
+              <span class="brand-badge">Mr. Mercado Simulator</span>
+              <span class="hero-tag">Astrophysics Lab</span>
+            </div>
+            <p class="eyebrow">ASTROPHYSICS INVESTIGATION TOOL</p>
+            <h1>Wien's Law Blackbody Explorer</h1>
+            <p class="subtitle">
+              Investigate how temperature determines the radiation emitted by objects in the universe.
+            </p>
+          </div>
+        </div>
+      </header>
+
+      <main class="workspace">
+          <section class="panel graph-panel">
+            <div class="panel-heading graph-heading">
+              <div>
+                <p class="kicker">Graph Panel</p>
+                <h2>Blackbody Radiation Graph</h2>
+            </div>
+            <div class="graph-legend">
+              <span class="legend-chip visible">Visible spectrum</span>
+              <span class="legend-chip curve">Planck curve</span>
+              <span class="legend-chip peak">&lambda;<sub>max</sub></span>
+            </div>
+          </div>
+
+          <div class="graph-frame">
+            <div id="blackbody-plot" class="plot" aria-label="Blackbody radiation plot"></div>
+          </div>
+
+          <div class="graph-note">
+            <p id="graph-caption">Enter a temperature to draw the Planck distribution and locate the peak wavelength.</p>
+          </div>
+        </section>
+
+        <section class="panel controls-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="kicker">Control Panel</p>
+              <h2>Object Investigation</h2>
+            </div>
+            <span class="panel-badge">Mr. Mercado Simulator</span>
+          </div>
+
+          <section class="control-card">
+            <div class="section-title-row">
+              <h3>Object Entry</h3>
+              <span class="mini-chip">Add 5 or more objects</span>
+            </div>
+
+            <div class="field-grid">
+              <label class="field">
+                <span>Object Name</span>
+                <input id="object-name" type="text" placeholder="Example: Sun, Sirius A, Lava" />
+              </label>
+
+              <label class="field">
+                <span>Temperature (K)</span>
+                <input id="temperature-input" type="number" min="1" step="any" placeholder="Enter Kelvin" />
+              </label>
+
+              <label class="field field-wide">
+                <span>Object Information</span>
+                <textarea id="object-info" rows="4" placeholder="Short description, location, composition, or why it behaves approximately like a blackbody."></textarea>
+              </label>
+            </div>
+
+            <div class="button-grid">
+              <button id="calculate-btn" class="btn btn-primary" type="button">Calculate &lambda;<sub>max</sub></button>
+              <button id="new-entry-btn" class="btn btn-secondary" type="button">New Object Space</button>
+              <button id="sun-example-btn" class="btn btn-secondary" type="button">Load Sun Example</button>
+              <button id="reset-btn" class="btn btn-ghost" type="button">Reset Simulation</button>
+            </div>
+
+            <p id="status-message" class="status-message">Awaiting input.</p>
+          </section>
+
+          <section class="results-card">
+            <div class="results-header">
+              <h3>Calculated Results</h3>
+              <button id="add-result-btn" class="btn btn-accent" type="button" disabled>Add Result</button>
+            </div>
+
+            <div class="results-grid">
+              <article class="result-tile">
+                <span class="result-label">Object</span>
+                <strong id="result-object">&mdash;</strong>
+              </article>
+
+              <article class="result-tile">
+                <span class="result-label">Temperature</span>
+                <strong id="result-temperature">&mdash;</strong>
+              </article>
+
+              <article class="result-tile">
+                <span class="result-label">Peak Wavelength</span>
+                <strong id="result-lambda">&mdash;</strong>
+              </article>
+
+              <article class="result-tile">
+                <span class="result-label">Radiation Type</span>
+                <strong id="result-region">&mdash;</strong>
+              </article>
+            </div>
+
+            <div class="result-summary">
+              <span class="result-label">Object Information</span>
+              <p id="result-info">&mdash;</p>
+            </div>
+          </section>
+
+          <section class="table-card">
+            <div class="table-header">
+              <h3>Research Table</h3>
+              <span id="table-count">0 recorded</span>
+            </div>
+
+            <p id="progress-note" class="progress-note">Add at least 5 objects to unlock PDF export.</p>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Object</th>
+                    <th>Temperature (K)</th>
+                    <th>Information</th>
+                    <th>&lambda;<sub>max</sub> (nm)</th>
+                    <th>Radiation Type</th>
+                  </tr>
+                </thead>
+                <tbody id="results-table-body">
+                  <tr class="empty-row">
+                    <td colspan="5">No investigation entries yet.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="export-actions">
+              <button id="download-pdf-btn" class="btn btn-primary" type="button" disabled>Download PDF Report</button>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <div class="export-plot-shell" aria-hidden="true">
+      <div id="pdf-export-plot" class="export-plot"></div>
+    </div>
+  </body>
+</html>
