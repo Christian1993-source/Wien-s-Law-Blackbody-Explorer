@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Wien's Law Blackbody Radiation - Mr. Mercado Astrophysics Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Orbitron:wght@500;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [["$", "$"], ["\\(", "\\)"]],
+          displayMath: [["$$", "$$"], ["\\[", "\\]"]],
+        },
+        svg: {
+          fontCache: "global",
+        },
+      };
+    </script>
+    <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  </head>
+  <body>
+    <div class="app-grid">
+      <aside class="left-panel">
+        <section class="panel-card intro-card">
+          <p class="eyebrow">Mr. Mercado Astrophysics Lab</p>
+          <h1>Wien's Law Blackbody Explorer</h1>
+          <p class="intro-text">
+            Investigate how temperature affects the peak wavelength of radiation using Wien's Law.
+          </p>
+        </section>
+
+        <section class="panel-card formula-card">
+          <p class="eyebrow">Peak Wavelength (Wien's Law)</p>
+          <div class="formula-equation">$$\lambda_{\text{max}} = \frac{0.0029}{T}$$</div>
+          <div class="formula-meta">
+            <span><strong>&lambda;<sub>max</sub></strong> = peak wavelength</span>
+            <span><strong>T</strong> = temperature (Kelvin)</span>
+          </div>
+        </section>
+
+        <section class="panel-card control-card">
+          <div class="controls-bar">
+            <button id="loadExamplesButton" class="button ghost" type="button">Load Example Data</button>
+            <button id="resetObjectsButton" class="button ghost" type="button">Reset Objects</button>
+            <button id="addObjectButton" class="button primary" type="button">Add Object</button>
+          </div>
+        </section>
+
+        <section class="panel-card inputs-card">
+          <div class="panel-head">
+            <div>
+              <h2>Object Inputs</h2>
+              <p class="panel-copy">Enter name, description, image, and temperature for each object.</p>
+            </div>
+            <span id="objectLimitHint" class="panel-meta">1 of 6</span>
+          </div>
+          <div id="objectCards" class="object-cards" aria-live="polite"></div>
+        </section>
+
+        <section class="panel-card report-card">
+          <div class="panel-head">
+            <div>
+              <h2>PDF Report</h2>
+              <p class="panel-copy">Export a clean laboratory report with data, images, and graph.</p>
+            </div>
+            <span class="panel-meta">Export</span>
+          </div>
+          <label class="field">
+            <span>Student Name</span>
+            <input
+              id="studentNameInput"
+              type="text"
+              placeholder="Enter the student's name for the report"
+            />
+          </label>
+          <button id="generatePdfButton" class="button secondary wide-button" type="button">
+            Generate PDF Report
+          </button>
+          <div id="statusMessage" class="status-message" role="status" aria-live="polite"></div>
+        </section>
+      </aside>
+
+      <section class="right-panel">
+        <div class="graph-shell">
+          <div class="graph-head">
+            <div>
+              <p class="eyebrow">Spectrum View</p>
+              <h2>Blackbody Radiation Spectrum</h2>
+            </div>
+          </div>
+          <div class="graph-layout">
+            <div id="graph"></div>
+            <aside class="graph-legend-panel">
+              <div class="legend-head">
+                <p class="eyebrow">Curve Legend</p>
+                <h3>Objects</h3>
+              </div>
+              <div id="graphLegend" class="graph-legend-list" aria-live="polite"></div>
+            </aside>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <template id="objectCardTemplate">
+      <article class="object-card">
+        <div class="card-topline">
+          <div>
+            <p class="card-label">Investigation Object</p>
+            <h3 class="card-title"></h3>
+            <p class="card-helper">Enter data below, then generate the radiation graph.</p>
+          </div>
+          <div class="card-tools">
+            <span class="color-indicator" aria-hidden="true"></span>
+            <button class="button danger remove-button" type="button">Remove Object</button>
+          </div>
+        </div>
+
+        <div class="field-grid">
+          <label class="field">
+            <span>Object Name</span>
+            <input class="object-name" type="text" placeholder="Example: Sun" />
+          </label>
+
+          <label class="field field-wide">
+            <span>Description</span>
+            <textarea
+              class="object-description"
+              rows="3"
+              placeholder="Why does this object behave approximately like a blackbody?"
+            ></textarea>
+          </label>
+
+          <label class="field">
+            <span>Temperature (Kelvin)</span>
+            <input
+              class="object-temperature"
+              type="number"
+              min="1"
+              step="any"
+              placeholder="Example: 5778"
+            />
+          </label>
+
+          <label class="field field-wide">
+            <span>Upload Object Image</span>
+            <input class="object-image" type="file" accept=".jpg,.jpeg,.png,image/png,image/jpeg" />
+          </label>
+        </div>
+
+        <div class="image-preview-frame">
+          <div class="image-preview-empty">No image uploaded yet.</div>
+          <img class="image-preview" alt="Uploaded object preview" hidden />
+        </div>
+
+        <div class="result-strip" hidden>
+          <div class="result-pill">
+            <span>Peak Wavelength</span>
+            <strong class="peak-value">-</strong>
+          </div>
+          <div class="result-pill">
+            <span>Radiation Type</span>
+            <strong class="radiation-value">-</strong>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="button primary generate-button" type="button">Generate Radiation Graph</button>
+        </div>
+      </article>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>
